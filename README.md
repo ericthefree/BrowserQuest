@@ -4,6 +4,18 @@ BrowserQuest
 BrowserQuest is a HTML5/JavaScript multiplayer game experiment.
 
 
+Quick Start
+-----------
+
+Requires [Node.js](https://nodejs.org) and Python 3.
+
+    ./bin/setup.sh
+
+This installs dependencies, starts the game server and a local client server,
+and opens the game in your browser at `http://localhost:8080`. Press
+`Ctrl+C` to stop both servers.
+
+
 Documentation
 -------------
 

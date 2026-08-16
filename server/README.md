@@ -1,24 +1,25 @@
 BrowserQuest server documentation
 =================================
 
-The game server currently runs on nodejs v0.4.7 (but should run fine on the latest stable as well) and requires the latest versions of the following npm libraries:
+The game server runs on Node.js (tested with v22) and requires the following npm packages:
 
 - underscore
 - log
 - bison
 - websocket
-- websocket-server
 - sanitizer
 - memcache (only if you want metrics)
 
-All of them can be installed via `npm install -d` (this will install a local copy of all the dependencies in the node_modules directory)
+All of them can be installed via `npm install` from the project root (this will install a local copy of all the dependencies in the node_modules directory).
+
+Running `../bin/setup.sh` from the project root does this automatically, along with setting up a working `config_local.json` and starting the server — see the root README for the quick-start path.
 
 
 Configuration
 -------------
 
 The server settings (number of worlds, number of players per world, etc.) can be configured.
-Copy `config_local.json` to a new `config_local.json` file, then edit it. The server will override default settings with this file.
+Copy `config.json` to a new `config_local.json` file in this directory, then edit it. The server will override default settings with this file.
 
 
 Deployment
