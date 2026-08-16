@@ -18,7 +18,7 @@ Configuration
 -------------
 
 The server settings (number of worlds, number of players per world, etc.) can be configured.
-Copy `config_local.json-dist` to a new `config_local.json` file, then edit it. The server will override default settings with this file.
+Copy `config_local.json` to a new `config_local.json` file, then edit it. The server will override default settings with this file.
 
 
 Deployment

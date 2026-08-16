@@ -88,7 +88,7 @@ define(['jquery', 'app'], function($, App) {
         	    app.toggleAbout();
         	});
 
-            $('#nameinput').bind("keyup", function() {
+            $('#nameinput').on("keyup", function() {
                 app.toggleButton();
             });
     
@@ -116,7 +116,7 @@ define(['jquery', 'app'], function($, App) {
                 }
             });
 
-            $('#notifications div').bind(TRANSITIONEND, app.resetMessagesPosition.bind(app));
+            $('#notifications div').on(TRANSITIONEND, app.resetMessagesPosition.bind(app));
     
             $('.close').click(function() {
                 app.hideWindows();
@@ -154,9 +154,15 @@ define(['jquery', 'app'], function($, App) {
         
             document.addEventListener("touchstart", function() {},false);
             
-            $('#resize-check').bind("transitionend", app.resizeUi.bind(app));
-            $('#resize-check').bind("webkitTransitionEnd", app.resizeUi.bind(app));
-            $('#resize-check').bind("oTransitionEnd", app.resizeUi.bind(app));
+            $('#resize-check').on("transitionend", app.resizeUi.bind(app));
+            $('#resize-check').on("webkitTransitionEnd", app.resizeUi.bind(app));
+            $('#resize-check').on("oTransitionEnd", app.resizeUi.bind(app));
+
+            var resizeTimer;
+            $(window).on('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(app.resizeUi.bind(app), 150);
+            });
         
             log.info("App initialized.");
         
@@ -245,7 +251,7 @@ define(['jquery', 'app'], function($, App) {
     		$('#chatbox').attr('value', '');
     		
         	if(game.renderer.mobile || game.renderer.tablet) {
-                $('#foreground').bind('touchstart', function(event) {
+                $('#foreground').on('touchstart', function(event) {
                     app.center();
                     app.setMouseCoordinates(event.originalEvent.touches[0]);
                 	game.click();
@@ -263,7 +269,7 @@ define(['jquery', 'app'], function($, App) {
                 });
             }
 
-            $('body').unbind('click');
+            $('body').off('click');
             $('body').click(function(event) {
                 var hasClosedParchment = false;
                 
@@ -361,11 +367,11 @@ define(['jquery', 'app'], function($, App) {
                 game.audioManager.toggle();
             });
             
-            $(document).bind("keydown", function(e) {
+            $(document).on("keydown", function(e) {
             	var key = e.which,
             	    $chat = $('#chatinput');
 
-                if($('#chatinput:focus').size() == 0 && $('#nameinput:focus').size() == 0) {
+                if($('#chatinput:focus').length == 0 && $('#nameinput:focus').length == 0) {
                     if(key === 13) { // Enter
                         if(game.ready) {
                             $chat.focus();

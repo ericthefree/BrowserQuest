@@ -71,6 +71,7 @@ module.exports = Player = Character.extend({
                 self.server.pushSpawnsToPlayer(self, message);
             }
             else if(action === Types.Messages.ZONE) {
+                log.debug(self.name + " (" + self.id + ") ZONE update from (" + self.x + ", " + self.y + ")");
                 self.zone_callback();
             }
             else if(action === Types.Messages.CHAT) {
@@ -192,15 +193,19 @@ module.exports = Player = Character.extend({
             else if(action === Types.Messages.TELEPORT) {
                 var x = message[1],
                     y = message[2];
-                
+
+                log.debug(self.name + " (" + self.id + ") TELEPORT from (" + self.x + ", " + self.y + ") to (" + x + ", " + y + ")");
+
                 if(self.server.isValidPosition(x, y)) {
                     self.setPosition(x, y);
                     self.clearTarget();
-                    
+
                     self.broadcast(new Messages.Teleport(self));
-                    
+
                     self.server.handlePlayerVanish(self);
                     self.server.pushRelevantEntityListTo(self);
+                } else {
+                    log.debug(self.name + " (" + self.id + ") TELEPORT to (" + x + ", " + y + ") rejected: invalid position");
                 }
             }
             else if(action === Types.Messages.OPEN) {

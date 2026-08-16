@@ -240,7 +240,96 @@ define(['jquery', 'area'], function($, Area) {
         isOutOfBounds: function(x, y) {
             return isInt(x) && isInt(y) && (x < 0 || x >= this.width || y < 0 || y >= this.height);
         },
-    
+
+        /**
+         * Determines which tiles, bounded to [minX,maxX]x[minY,maxY], should
+         * be drawn given the player is standing at (startX, startY). Used so
+         * a wide camera never draws terrain from a different, disconnected
+         * area of the map (e.g. an unrelated building's interior) that
+         * happens to fall within the camera's tile range but isn't actually
+         * part of the same space the player is in.
+         *
+         * Flood-fills from the player through orthogonally-adjacent
+         * non-empty tiles, treating doors as the only barrier: crossing a
+         * door is a teleport, not a continuous walk, so whatever sits
+         * beyond one in raw map coordinates is a different, unrelated area,
+         * and the door itself is marked reachable (so its archway still
+         * draws) without being a tile the fill continues through.
+         *
+         * Deliberately not collision-based — walkability seems like the
+         * obvious way to define a room's boundary, but it isn't: outdoor
+         * terrain routinely has walkable ground that's only reachable via a
+         * detour (the far bank of a pond, the other side of a bridge), and
+         * unwalkable decoration (cliffs, wide obstacles) that's several
+         * tiles deep. Both are real, visible, connected scenery that a
+         * walkability-only fill would wrongly hide. Raw tile data being
+         * non-empty is a much better proxy for "this is part of the same
+         * drawn space" — the only thing that actually needs to act as a
+         * hard boundary is a door.
+         *
+         * Returns a map of tile-index -> true for every reachable tile, or
+         * null if the starting position is out of bounds (caller should
+         * then skip filtering and draw everything in range).
+         */
+        computeReachableRegion: function(startX, startY, minX, minY, maxX, maxY) {
+            var self = this,
+                reachable = {},
+                seen = {},
+                queue = [[startX, startY]],
+                deltas = [[1,0],[-1,0],[0,1],[0,-1]];
+
+            function tileIndexAt(x, y) {
+                return self.GridPositionToTileIndex(x, y) - 1;
+            }
+
+            function isEmptyTile(x, y) {
+                if(self.isOutOfBounds(x, y)) {
+                    return true;
+                }
+                return !self.data[tileIndexAt(x, y)];
+            }
+
+            if(self.isOutOfBounds(startX, startY)) {
+                return null;
+            }
+
+            seen[startX+','+startY] = true;
+            reachable[tileIndexAt(startX, startY)] = true;
+
+            while(queue.length > 0) {
+                var pos = queue.shift(),
+                    x = pos[0],
+                    y = pos[1];
+
+                for(var i = 0; i < deltas.length; i++) {
+                    var nx = x + deltas[i][0],
+                        ny = y + deltas[i][1];
+
+                    if(nx < minX || nx > maxX || ny < minY || ny > maxY) {
+                        continue;
+                    }
+
+                    var key = nx+','+ny;
+                    if(seen[key]) {
+                        continue;
+                    }
+                    seen[key] = true;
+
+                    if(isEmptyTile(nx, ny)) {
+                        continue;
+                    }
+
+                    reachable[tileIndexAt(nx, ny)] = true;
+
+                    if(!self.isDoor(nx, ny)) {
+                        queue.push([nx, ny]);
+                    }
+                }
+            }
+
+            return reachable;
+        },
+
         /**
          * Returns true if the given tile id is "high", i.e. above all entities.
          * Used by the renderer to know which tiles to draw after all the entities 
