@@ -6,11 +6,11 @@
     optimizeCss: "standard.keepLines",
     
     paths: {
-        "jquery": "lib/require-jquery"
+        "jquery": "lib/jquery"
     },
 
     modules: [
-        //Optimize the require-jquery.js file by applying any minification
+        //Optimize jquery.js by applying any minification
         //that is desired via the optimize: setting above.
         {
             name: "jquery"

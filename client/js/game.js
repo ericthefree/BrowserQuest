@@ -505,10 +505,14 @@ function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedT
          */
         initAnimatedTiles: function() {
             var self = this,
-                m = this.map;
+                m = this.map,
+                reachable = this.reachableTiles;
 
             this.animatedTiles = [];
             this.forEachVisibleTile(function (id, index) {
+                if(reachable && !reachable[index]) {
+                    return;
+                }
                 if(m.isAnimatedTile(id)) {
                     var tile = new AnimatedTile(id, m.getTileAnimationLength(id), m.getTileAnimationDelay(id), index),
                         pos = self.map.tileIndexToGridPosition(tile.index);
@@ -952,16 +956,17 @@ function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedT
                         self.player.turnTo(dest.orientation);
                         self.client.sendTeleport(dest.x, dest.y);
                         
-                        if(self.renderer.mobile && dest.cameraX && dest.cameraY) {
-                            self.camera.setGridPosition(dest.cameraX, dest.cameraY);
-                            self.resetZone();
+                        if(dest.portal) {
+                            self.assignBubbleTo(self.player);
                         } else {
-                            if(dest.portal) {
-                                self.assignBubbleTo(self.player);
-                            } else {
-                                self.camera.focusEntity(self.player);
-                                self.resetZone();
-                            }
+                            // Center on the player rather than snapping to a
+                            // zone-aligned position: the camera is now
+                            // dynamically sized to fill the window, so a
+                            // room (usually much smaller than the camera)
+                            // needs to be actively centered, not just
+                            // whichever zone cell it happens to land in.
+                            self.camera.lookAt(self.player);
+                            self.resetZone();
                         }
                         
                         if(_.size(self.player.attackers) > 0) {
@@ -1659,10 +1664,14 @@ function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedT
          */
         forEachVisibleEntityByDepth: function(callback) {
             var self = this,
-                m = this.map;
-        
+                m = this.map,
+                reachable = this.reachableTiles;
+
             this.camera.forEachVisiblePosition(function(x, y) {
                 if(!m.isOutOfBounds(x, y)) {
+                    if(reachable && !reachable[m.GridPositionToTileIndex(x, y) - 1]) {
+                        return; // Not connected to the player — a different, unrelated area
+                    }
                     if(self.renderingGrid[y][x]) {
                         _.each(self.renderingGrid[y][x], function(entity) {
                             callback(entity);
@@ -2173,14 +2182,36 @@ function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedT
             return !_.isNull(this.currentZoning);
         },
     
+        // Computed here and reused by initAnimatedTiles() and the renderer's
+        // terrain/high-tile draws, so a wide camera never shows tiles from a
+        // different, disconnected area of the map (e.g. an unrelated
+        // building) that only happen to fall within its tile range without
+        // actually being reachable on foot from the player's current
+        // position. Must be refreshed whenever the camera's bounds change —
+        // both on zone/door transitions and on window resize.
+        updateReachableTiles: function() {
+            // Bounds padded by 2 tiles on each side — the widest "extra"
+            // buffer used by any of the forEachVisible* iterations this
+            // feeds (entity culling uses extra=2 on desktop), so nothing
+            // right at the edge of the camera gets miscounted as
+            // unreachable just because the flood-fill region was drawn
+            // slightly tighter than what a caller iterates over.
+            this.reachableTiles = this.player ? this.map.computeReachableRegion(
+                this.player.gridX, this.player.gridY,
+                this.camera.gridX - 2, this.camera.gridY - 2,
+                this.camera.gridX + this.camera.gridW + 2, this.camera.gridY + this.camera.gridH + 2
+            ) : null;
+        },
+
         resetZone: function() {
             this.bubbleManager.clean();
+            this.updateReachableTiles();
             this.initAnimatedTiles();
             this.renderer.renderStaticCanvases();
         },
     
         resetCamera: function() {
-            this.camera.focusEntity(this.player);
+            this.camera.lookAt(this.player);
             this.resetZone();
         },
     
@@ -2299,6 +2330,8 @@ function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedT
                 this.camera = this.renderer.camera;
                 this.camera.setPosition(x, y);
 
+                this.updateReachableTiles();
+                this.initAnimatedTiles();
                 this.renderer.renderStaticCanvases();
         },
     

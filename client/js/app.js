@@ -45,7 +45,7 @@ define(['jquery', 'storage'], function($, Storage) {
                         // on desktop and tablets, add a spinner to the play button
                         $play.addClass('loading');
                     }
-                    this.$playDiv.unbind('click');
+                    this.$playDiv.off('click');
                     var watchCanStart = setInterval(function() {
                         log.debug("waiting...");
                         if(self.canStartGame()) {
@@ -59,7 +59,7 @@ define(['jquery', 'storage'], function($, Storage) {
                         }
                     }, 100);
                 } else {
-                    this.$playDiv.unbind('click');
+                    this.$playDiv.off('click');
                     this.startGame(username, starting_callback);
                 }      
             }
@@ -221,10 +221,10 @@ define(['jquery', 'storage'], function($, Storage) {
                 $achievements = $('#achievements');
 
             if($achievements.hasClass('active')) {
-                $achievements.bind(TRANSITIONEND, function() {
+                $achievements.on(TRANSITIONEND, function() {
                     $achievements.removeClass('page' + self.currentPage).addClass('page1');
                     self.currentPage = 1;
-                    $achievements.unbind(TRANSITIONEND);
+                    $achievements.off(TRANSITIONEND);
                 });
             }
         },

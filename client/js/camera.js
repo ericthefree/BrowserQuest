@@ -13,13 +13,11 @@ define(function() {
         },
     
         rescale: function() {
-            var factor = this.renderer.mobile ? 1 : 2;
-        
-            this.gridW = 15 * factor;
-            this.gridH = 7 * factor;
-        
+            var grid = this.renderer.getGridSize();
+            this.gridW = grid.width;
+            this.gridH = grid.height;
+
             log.debug("---------");
-            log.debug("Factor:"+factor);
             log.debug("W:"+this.gridW + " H:" + this.gridH);
         },
 

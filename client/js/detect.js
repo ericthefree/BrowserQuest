@@ -9,14 +9,13 @@ Detect.userAgentContains = function(string) {
     return navigator.userAgent.indexOf(string) != -1;
 };
 
+Detect.isMobileDevice = function() {
+    return (Detect.userAgentContains('Android') && Detect.userAgentContains('Firefox'))
+        || Detect.userAgentContains('Mobile');
+};
+
 Detect.isTablet = function(screenWidth) {
-    if(screenWidth > 640) {
-        if((Detect.userAgentContains('Android') && Detect.userAgentContains('Firefox'))
-        || Detect.userAgentContains('Mobile')) {
-            return true;
-        }
-    }
-    return false;
+    return screenWidth > 640 && Detect.isMobileDevice();
 };
 
 Detect.isWindows = function() {

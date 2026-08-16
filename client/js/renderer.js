@@ -51,20 +51,21 @@ function(Camera, Item, Character, Player, Timer) {
             var w = window.innerWidth,
                 h = window.innerHeight,
                 scale;
-        
-            this.mobile = false;
-        
-            if(w <= 1000) {
-                scale = 2;
-                this.mobile = true;
-            }
-            else if(w <= 1500 || h <= 870) {
+
+            // "mobile" reflects actual device capability (touch/phone), not
+            // window width, so a desktop browser resized narrow still gets
+            // the robust full-redraw desktop render path rather than the
+            // dirty-rect-optimized mobile path (which assumes a small,
+            // steady viewport and leaves trailing artifacts otherwise).
+            this.mobile = Detect.isMobileDevice();
+
+            if(w <= 1000 || w <= 1500 || h <= 870) {
                 scale = 2;
             }
             else {
                 scale = 3;
             }
-        
+
             return scale;
         },
     
@@ -91,18 +92,95 @@ function(Camera, Item, Character, Player, Timer) {
         createCamera: function() {
             this.camera = new Camera(this);
             this.camera.rescale();
-        
+
             this.canvas.width = this.camera.gridW * this.tilesize * this.scale;
             this.canvas.height = this.camera.gridH * this.tilesize * this.scale;
             log.debug("#entities set to "+this.canvas.width+" x "+this.canvas.height);
-        
+
             this.backcanvas.width = this.canvas.width;
             this.backcanvas.height = this.canvas.height;
             log.debug("#background set to "+this.backcanvas.width+" x "+this.backcanvas.height);
-        
+
             this.forecanvas.width = this.canvas.width;
             this.forecanvas.height = this.canvas.height;
             log.debug("#foreground set to "+this.forecanvas.width+" x "+this.forecanvas.height);
+
+            this.layoutViewport();
+        },
+
+        // #canvasborder reserves space for its decorative frame either via
+        // padding or via border-width (border-image), depending on the tier.
+        // Sum both so callers don't care which mechanism is in play.
+        getFrameInsets: function(canvasborder) {
+            var style = canvasborder ? window.getComputedStyle(canvasborder) : null;
+
+            if(!style) {
+                return {x: 0, y: 0};
+            }
+
+            return {
+                x: (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0) +
+                   (parseFloat(style.borderLeftWidth) || 0) + (parseFloat(style.borderRightWidth) || 0),
+                y: (parseFloat(style.paddingTop) || 0) + (parseFloat(style.paddingBottom) || 0) +
+                   (parseFloat(style.borderTopWidth) || 0) + (parseFloat(style.borderBottomWidth) || 0)
+            };
+        },
+
+        // Number of tiles that fit in the actual browser window at the
+        // current sprite scale, based on the live #canvasborder frame and
+        // #bar-container height (so it stays in sync if those CSS values
+        // ever change). Applies at every size, including mobile.
+        //
+        // Not capped: the camera can be as large as the window allows.
+        // Indoor areas (building/dungeon interiors) are small, disconnected
+        // islands placed close together in the same shared tile grid, so a
+        // wide camera could otherwise render neighboring, unrelated rooms —
+        // that's handled separately, by only ever drawing tiles reachable
+        // from the player's position (see Map.computeReachableRegion).
+        getGridSize: function() {
+            var tilePixels = this.tilesize * this.scale,
+                canvasborder = document.getElementById('canvasborder'),
+                barContainer = document.getElementById('bar-container'),
+                insets = this.getFrameInsets(canvasborder),
+                barHeight = barContainer ? barContainer.offsetHeight : 0,
+                availableWidth = window.innerWidth - insets.x,
+                availableHeight = window.innerHeight - insets.y - barHeight;
+
+            return {
+                width: Math.max(10, Math.floor(availableWidth / tilePixels)),
+                height: Math.max(6, Math.floor(availableHeight / tilePixels))
+            };
+        },
+
+        // Resizes #container/#canvas/#bubbles to hug the current camera's
+        // pixel dimensions so the game fills the browser window at every
+        // size instead of being capped at a fixed preset size.
+        layoutViewport: function() {
+            var canvasDiv = document.getElementById('canvas'),
+                bubbles = document.getElementById('bubbles'),
+                container = document.getElementById('container'),
+                width = this.canvas.width,
+                height = this.canvas.height,
+                canvasborder = document.getElementById('canvasborder'),
+                barContainer = document.getElementById('bar-container'),
+                insets = this.getFrameInsets(canvasborder),
+                barHeight = barContainer ? barContainer.offsetHeight : 0,
+                totalWidth = width + insets.x,
+                totalHeight = height + insets.y + barHeight;
+
+            if(canvasDiv) {
+                canvasDiv.style.height = height + "px";
+            }
+            if(bubbles) {
+                bubbles.style.height = height + "px";
+                bubbles.style.marginBottom = (-height) + "px";
+                bubbles.style.top = (-height) + "px";
+            }
+            if(container) {
+                container.style.width = totalWidth + "px";
+                container.style.marginLeft = (-totalWidth / 2) + "px";
+                container.style.marginTop = (-totalHeight / 2) + "px";
+            }
         },
     
         initFPS: function() {
@@ -567,9 +645,13 @@ function(Camera, Item, Character, Player, Timer) {
         drawTerrain: function() {
             var self = this,
                 m = this.game.map,
-                tilesetwidth = this.tileset.width / m.tilesize;
-        
+                tilesetwidth = this.tileset.width / m.tilesize,
+                reachable = this.game.reachableTiles;
+
             this.game.forEachVisibleTile(function (id, index) {
+                if(reachable && !reachable[index]) { // Not connected to the player — a different, unrelated area
+                    return;
+                }
                 if(!m.isHighTile(id) && !m.isAnimatedTile(id)) { // Don't draw unnecessary tiles
                     self.drawTile(self.background, id, self.tileset, tilesetwidth, m.width, index);
                 }
@@ -603,7 +685,14 @@ function(Camera, Item, Character, Player, Timer) {
             var self = this,
                 m = this.game.map,
                 tilesetwidth = this.tileset.width / m.tilesize;
-        
+
+            // Not reachability-filtered: high tiles are tall structures
+            // (building roofs, tree canopies) meant to always be visible
+            // from outside, drawn above entities specifically so a player
+            // can walk "under" them. They're frequently several tiles deep
+            // from the nearest walkable ground, unlike room walls, so
+            // filtering them the same way as regular terrain would
+            // incorrectly blank out most of a roof.
             this.highTileCount = 0;
             this.game.forEachVisibleTile(function (id, index) {
                 if(m.isHighTile(id)) {
@@ -703,6 +792,14 @@ function(Camera, Item, Character, Player, Timer) {
         },
     
         renderStaticCanvases: function() {
+            // Paint opaque black rather than just clearing to transparent —
+            // tiles outside the player's reachable area (see
+            // Map.computeReachableRegion) are intentionally left undrawn,
+            // and a transparent gap would let #background's CSS loading
+            // image show through underneath the canvas.
+            this.background.fillStyle = "#000";
+            this.background.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
             this.background.save();
                 this.setCameraView(this.background);
                 this.drawTerrain();

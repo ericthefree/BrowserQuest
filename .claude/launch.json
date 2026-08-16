@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "browserquest-client",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [".claude/no_cache_server.py"],
+      "port": 8080
+    }
+  ]
+}

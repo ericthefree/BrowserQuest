@@ -1,8 +1,6 @@
 
 var cls = require("./lib/class"),
     url = require('url'),
-    wsserver = require("websocket-server"),
-    miksagoConnection = require('websocket-server/lib/ws/connection'),
     worlizeRequest = require('websocket').request,
     http = require('http'),
     Utils = require('./utils'),
@@ -134,23 +132,7 @@ WS.MultiVersionWebsocketServer = Server.extend({
         this._httpServer.listen(port, function() {
             log.info("Server is listening on port "+port);
         });
-        
-        this._miksagoServer = wsserver.createServer();
-        this._miksagoServer.server = this._httpServer;
-        this._miksagoServer.addListener('connection', function(connection) {
-            // Add remoteAddress property
-            connection.remoteAddress = connection._socket.remoteAddress;
 
-            // We want to use "sendUTF" regardless of the server implementation
-            connection.sendUTF = connection.send;
-            var c = new WS.miksagoWebSocketConnection(self._createId(), connection, self);
-            
-            if(self.connection_callback) {
-                self.connection_callback(c);
-            }
-            self.addConnection(c);
-        });
-        
         this._httpServer.on('upgrade', function(req, socket, head) {
             if (typeof req.headers['sec-websocket-version'] !== 'undefined') {
                 // WebSocket hybi-08/-09/-10 connection (WebSocket-Node)
@@ -169,13 +151,8 @@ WS.MultiVersionWebsocketServer = Server.extend({
                     return;
                 }
             } else {
-                // WebSocket hixie-75/-76/hybi-00 connection (node-websocket-server)
-                if (req.method === 'GET' &&
-                    (req.headers.upgrade && req.headers.connection) &&
-                    req.headers.upgrade.toLowerCase() === 'websocket' &&
-                    req.headers.connection.toLowerCase() === 'upgrade') {
-                    new miksagoConnection(self._miksagoServer.manager, self._miksagoServer.options, req, socket, head);
-                }
+                // Legacy hixie-75/-76/hybi-00 clients are no longer supported.
+                socket.end();
             }
         });
     },
@@ -246,49 +223,5 @@ WS.worlizeWebSocketConnection = Connection.extend({
     
     sendUTF8: function(data) {
         this._connection.sendUTF(data);
-    }
-});
-
-
-/**
- * Connection class for websocket-server (miksago)
- * https://github.com/miksago/node-websocket-server
- */
-WS.miksagoWebSocketConnection = Connection.extend({
-    init: function(id, connection, server) {
-        var self = this;
-        
-        this._super(id, connection, server);
-        
-        this._connection.addListener("message", function(message) {
-            if(self.listen_callback) {
-                if(useBison) {
-                    self.listen_callback(BISON.decode(message));
-                } else {
-                    self.listen_callback(JSON.parse(message));
-                }
-            }
-        });
-        
-        this._connection.on('close', function(connection) {
-            if(self.close_callback) {
-                self.close_callback();
-            }
-            delete self._server.removeConnection(self.id);
-        });
-    },
-    
-    send: function(message) {
-        var data;
-        if(useBison) {
-            data = BISON.encode(message);
-        } else {
-            data = JSON.stringify(message);
-        }
-        this.sendUTF8(data);
-    },
-    
-    sendUTF8: function(data) {
-        this._connection.send(data);
     }
 });
