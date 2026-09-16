@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">BrowserQuest</string>
+    <string name="load_error">BrowserQuest assets could not be loaded.\n\n%1$s</string>
+</resources>

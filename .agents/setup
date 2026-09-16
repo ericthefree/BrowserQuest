@@ -36,4 +36,33 @@ if [[ ! -f server/config_local.json ]]; then
     echo "Created server/config_local.json"
 fi
 
-echo "Orb setup complete ($(node --version), npm $(npm --version))."
+if [[ -d android ]]; then
+    if ! java -version 2>&1 | grep -q 'version "17'; then
+        step "Install JDK 17 for Android" sudo apt-get update -qq
+        step "Install JDK 17 packages" sudo apt-get install -y -qq openjdk-17-jdk-headless unzip
+    fi
+
+    android_sdk_root="${ANDROID_SDK_ROOT:-$HOME/.android-sdk}"
+    sdkmanager="$android_sdk_root/cmdline-tools/latest/bin/sdkmanager"
+    if [[ ! -x "$sdkmanager" ]]; then
+        tools_archive="$(mktemp --suffix=.zip)"
+        tools_directory="$(mktemp -d)"
+        step "Download Android command-line tools" curl -fsSL \
+            https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip \
+            -o "$tools_archive"
+        unzip -q "$tools_archive" -d "$tools_directory"
+        mkdir -p "$android_sdk_root/cmdline-tools"
+        rm -rf "$android_sdk_root/cmdline-tools/latest"
+        mv "$tools_directory/cmdline-tools" "$android_sdk_root/cmdline-tools/latest"
+        rm -f "$tools_archive"
+        rmdir "$tools_directory"
+    fi
+
+    "$sdkmanager" --sdk_root="$android_sdk_root" --licenses \
+        <<< "$(printf 'y\n%.0s' {1..20})" >/dev/null
+    step "Install Android SDK 35" "$sdkmanager" --sdk_root="$android_sdk_root" \
+        "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+    printf 'sdk.dir=%s\n' "$android_sdk_root" > android/local.properties
+fi
+
+echo "Orb setup complete ($(node --version), npm $(npm --version), Android SDK 35)."

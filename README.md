@@ -34,6 +34,14 @@ Both sync saves through iCloud. See each folder's README for signing, iCloud,
 and run instructions.
 
 
+Android
+-------
+
+The `android/` project packages the offline web client in a native Kotlin
+`WebView`, with native save backup and the same touch controls as the iOS web
+wrapper. See `android/README.md` for Android Studio and device instructions.
+
+
 Documentation
 -------------
 

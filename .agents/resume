@@ -10,3 +10,4 @@ cd "$repo_root"
 }
 
 echo "BrowserQuest orb is ready. Run 'amp orb services ensure' to start the game portal."
+echo "Build Android with 'cd android && ./gradlew assembleDebug'."
