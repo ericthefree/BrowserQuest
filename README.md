@@ -23,9 +23,15 @@ browser portal.
 iOS
 ---
 
-An Xcode project that packages the web client with `WKWebView` is available in
-`ios/BrowserQuest.xcodeproj`. It runs as an offline single-player game and
-syncs saves through iCloud. See `ios/README.md` for signing and iCloud setup.
+Two offline, single-player Xcode projects are available:
+
+- `ios/BrowserQuest.xcodeproj` packages the web client with `WKWebView`.
+- `ios-native/BrowserQuestNative.xcodeproj` is a native Swift and SpriteKit
+  game engine that reuses the original maps, artwork, and audio without a web
+  view or JavaScript runtime.
+
+Both sync saves through iCloud. See each folder's README for signing, iCloud,
+and run instructions.
 
 
 Documentation

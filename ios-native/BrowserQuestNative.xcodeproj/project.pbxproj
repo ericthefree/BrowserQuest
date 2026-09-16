@@ -1,0 +1,248 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B10000000000000000000001 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000001 /* AppDelegate.swift */; };
+		B10000000000000000000002 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000002 /* SceneDelegate.swift */; };
+		B10000000000000000000003 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000003 /* GameViewController.swift */; };
+		B10000000000000000000004 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000004 /* GameScene.swift */; };
+		B10000000000000000000005 /* MapModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000005 /* MapModel.swift */; };
+		B10000000000000000000006 /* TileMapRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000006 /* TileMapRenderer.swift */; };
+		B10000000000000000000007 /* SpriteFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000007 /* SpriteFactory.swift */; };
+		B10000000000000000000008 /* EntityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000008 /* EntityModel.swift */; };
+		B10000000000000000000009 /* SaveStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000009 /* SaveStore.swift */; };
+		B1000000000000000000000A /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000000A /* AudioManager.swift */; };
+		B1000000000000000000000B /* client in Resources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000000D /* client */; };
+		B1000000000000000000000C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000000E /* Assets.xcassets */; };
+		B1000000000000000000000D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2000000000000000000000F /* UIKit.framework */; };
+		B1000000000000000000000E /* SpriteKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000010 /* SpriteKit.framework */; };
+		B1000000000000000000000F /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* AVFoundation.framework */; };
+		B10000000000000000000010 /* Pathfinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* Pathfinder.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B20000000000000000000001 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		B20000000000000000000002 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		B20000000000000000000003 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
+		B20000000000000000000004 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
+		B20000000000000000000005 /* MapModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapModel.swift; sourceTree = "<group>"; };
+		B20000000000000000000006 /* TileMapRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileMapRenderer.swift; sourceTree = "<group>"; };
+		B20000000000000000000007 /* SpriteFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteFactory.swift; sourceTree = "<group>"; };
+		B20000000000000000000008 /* EntityModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityModel.swift; sourceTree = "<group>"; };
+		B20000000000000000000009 /* SaveStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveStore.swift; sourceTree = "<group>"; };
+		B2000000000000000000000A /* AudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
+		B2000000000000000000000B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B2000000000000000000000C /* BrowserQuestNative.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserQuestNative.entitlements; sourceTree = "<group>"; };
+		B2000000000000000000000D /* client */ = {isa = PBXFileReference; lastKnownFileType = folder; name = client; path = ../client; sourceTree = SOURCE_ROOT; };
+		B2000000000000000000000E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B2000000000000000000000F /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		B20000000000000000000010 /* SpriteKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SpriteKit.framework; path = System/Library/Frameworks/SpriteKit.framework; sourceTree = SDKROOT; };
+		B20000000000000000000011 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		B20000000000000000000012 /* BrowserQuestNative.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrowserQuestNative.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B20000000000000000000013 /* Pathfinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pathfinder.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B30000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1000000000000000000000D /* UIKit.framework in Frameworks */,
+				B1000000000000000000000E /* SpriteKit.framework in Frameworks */,
+				B1000000000000000000000F /* AVFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B40000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				B40000000000000000000002 /* BrowserQuestNative */,
+				B2000000000000000000000D /* client */,
+				B40000000000000000000003 /* Frameworks */,
+				B40000000000000000000004 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B40000000000000000000002 /* BrowserQuestNative */ = {
+			isa = PBXGroup;
+			children = (
+				B20000000000000000000001 /* AppDelegate.swift */,
+				B20000000000000000000002 /* SceneDelegate.swift */,
+				B20000000000000000000003 /* GameViewController.swift */,
+				B20000000000000000000004 /* GameScene.swift */,
+				B20000000000000000000005 /* MapModel.swift */,
+				B20000000000000000000013 /* Pathfinder.swift */,
+				B20000000000000000000006 /* TileMapRenderer.swift */,
+				B20000000000000000000007 /* SpriteFactory.swift */,
+				B20000000000000000000008 /* EntityModel.swift */,
+				B20000000000000000000009 /* SaveStore.swift */,
+				B2000000000000000000000A /* AudioManager.swift */,
+				B2000000000000000000000B /* Info.plist */,
+				B2000000000000000000000C /* BrowserQuestNative.entitlements */,
+				B2000000000000000000000E /* Assets.xcassets */,
+			);
+			path = BrowserQuestNative;
+			sourceTree = "<group>";
+		};
+		B40000000000000000000003 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B2000000000000000000000F /* UIKit.framework */,
+				B20000000000000000000010 /* SpriteKit.framework */,
+				B20000000000000000000011 /* AVFoundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B40000000000000000000004 /* Products */ = {
+			isa = PBXGroup;
+			children = (B20000000000000000000012 /* BrowserQuestNative.app */,);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B50000000000000000000001 /* BrowserQuestNative */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B90000000000000000000002 /* Build configuration list for PBXNativeTarget "BrowserQuestNative" */;
+			buildPhases = (
+				B30000000000000000000002 /* Sources */,
+				B30000000000000000000001 /* Frameworks */,
+				B30000000000000000000003 /* Resources */,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = BrowserQuestNative;
+			productName = BrowserQuestNative;
+			productReference = B20000000000000000000012 /* BrowserQuestNative.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B60000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = { B50000000000000000000001 = { CreatedOnToolsVersion = 16.0; }; };
+			};
+			buildConfigurationList = B90000000000000000000001 /* Build configuration list for PBXProject "BrowserQuestNative" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base,);
+			mainGroup = B40000000000000000000001;
+			productRefGroup = B40000000000000000000004 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (B50000000000000000000001 /* BrowserQuestNative */,);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B30000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1000000000000000000000B /* client in Resources */,
+				B1000000000000000000000C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B30000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B10000000000000000000001 /* AppDelegate.swift in Sources */,
+				B10000000000000000000002 /* SceneDelegate.swift in Sources */,
+				B10000000000000000000003 /* GameViewController.swift in Sources */,
+				B10000000000000000000004 /* GameScene.swift in Sources */,
+				B10000000000000000000005 /* MapModel.swift in Sources */,
+				B10000000000000000000010 /* Pathfinder.swift in Sources */,
+				B10000000000000000000006 /* TileMapRenderer.swift in Sources */,
+				B10000000000000000000007 /* SpriteFactory.swift in Sources */,
+				B10000000000000000000008 /* EntityModel.swift in Sources */,
+				B10000000000000000000009 /* SaveStore.swift in Sources */,
+				B1000000000000000000000A /* AudioManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		B80000000000000000000001 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {
+			CLANG_ENABLE_MODULES = YES;
+			COPY_PHASE_STRIP = NO;
+			DEBUG_INFORMATION_FORMAT = dwarf;
+			ENABLE_TESTABILITY = YES;
+			IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+			ONLY_ACTIVE_ARCH = YES;
+			SDKROOT = iphoneos;
+			SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+			SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			SWIFT_VERSION = 5.0;
+		}; name = Debug; };
+		B80000000000000000000002 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {
+			CLANG_ENABLE_MODULES = YES;
+			COPY_PHASE_STRIP = YES;
+			DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+			IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+			SDKROOT = iphoneos;
+			SWIFT_COMPILATION_MODE = wholemodule;
+			SWIFT_OPTIMIZATION_LEVEL = "-O";
+			SWIFT_VERSION = 5.0;
+		}; name = Release; };
+		B80000000000000000000003 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {
+			ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+			CODE_SIGN_ENTITLEMENTS = BrowserQuestNative/BrowserQuestNative.entitlements;
+			CODE_SIGN_STYLE = Automatic;
+			CURRENT_PROJECT_VERSION = 1;
+			DEVELOPMENT_TEAM = "";
+			GENERATE_INFOPLIST_FILE = NO;
+			INFOPLIST_FILE = BrowserQuestNative/Info.plist;
+			MARKETING_VERSION = 1.0;
+			PRODUCT_BUNDLE_IDENTIFIER = "com.web-quest.game.native";
+			PRODUCT_NAME = "$(TARGET_NAME)";
+			SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+			SUPPORTS_MACCATALYST = NO;
+			SWIFT_EMIT_LOC_STRINGS = YES;
+			TARGETED_DEVICE_FAMILY = "1,2";
+		}; name = Debug; };
+		B80000000000000000000004 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {
+			ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+			CODE_SIGN_ENTITLEMENTS = BrowserQuestNative/BrowserQuestNative.entitlements;
+			CODE_SIGN_STYLE = Automatic;
+			CURRENT_PROJECT_VERSION = 1;
+			DEVELOPMENT_TEAM = "";
+			GENERATE_INFOPLIST_FILE = NO;
+			INFOPLIST_FILE = BrowserQuestNative/Info.plist;
+			MARKETING_VERSION = 1.0;
+			PRODUCT_BUNDLE_IDENTIFIER = "com.web-quest.game.native";
+			PRODUCT_NAME = "$(TARGET_NAME)";
+			SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+			SUPPORTS_MACCATALYST = NO;
+			SWIFT_EMIT_LOC_STRINGS = YES;
+			TARGETED_DEVICE_FAMILY = "1,2";
+		}; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B90000000000000000000001 /* Build configuration list for PBXProject "BrowserQuestNative" */ = {isa = XCConfigurationList; buildConfigurations = (B80000000000000000000001, B80000000000000000000002,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		B90000000000000000000002 /* Build configuration list for PBXNativeTarget "BrowserQuestNative" */ = {isa = XCConfigurationList; buildConfigurations = (B80000000000000000000003, B80000000000000000000004,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = B60000000000000000000001 /* Project object */;
+}
