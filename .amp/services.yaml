@@ -1,0 +1,9 @@
+services:
+  game:
+    command: npm run dev
+    health: /healthz
+    portal:
+      url: /
+      title: BrowserQuest
+      description: Play the development game server in a browser.
+    agent: control

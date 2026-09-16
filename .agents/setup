@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+step() {
+    local label="$1"
+    shift
+    echo "==> $label"
+    time "$@"
+}
+
+command -v node >/dev/null 2>&1 || {
+    echo "Node.js 22 or newer is required." >&2
+    exit 1
+}
+command -v npm >/dev/null 2>&1 || {
+    echo "npm is required." >&2
+    exit 1
+}
+command -v python3 >/dev/null 2>&1 || {
+    echo "Python 3 is required by bin/setup.sh." >&2
+    exit 1
+}
+
+node -e 'const major = Number(process.versions.node.split(".")[0]); if (major < 22) process.exit(1)' || {
+    echo "Node.js 22 or newer is required; found $(node --version)." >&2
+    exit 1
+}
+
+step "Install locked Node.js dependencies" npm install --no-audit --no-fund
+
+if [[ ! -f server/config_local.json ]]; then
+    cp -- server/config.json server/config_local.json
+    echo "Created server/config_local.json"
+fi
+
+echo "Orb setup complete ($(node --version), npm $(npm --version))."

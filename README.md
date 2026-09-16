@@ -15,11 +15,24 @@ This installs dependencies, starts the game server and a local client server,
 and opens the game in your browser at `http://localhost:8080`. Press
 `Ctrl+C` to stop both servers.
 
+In an Amp orb, dependencies are installed by `.agents/setup`. Run
+`amp orb services ensure` to start the supervised game server and print its
+browser portal.
+
+
+iOS
+---
+
+An Xcode project that packages the web client with `WKWebView` is available in
+`ios/BrowserQuest.xcodeproj`. See `ios/README.md` for simulator, device, and
+server configuration instructions.
+
 
 Documentation
 -------------
 
-Documentation is located in client and server directories.
+Documentation is located in client and server directories. The current
+browser and server review is in `CODE_REVIEW.md`.
 
 
 License

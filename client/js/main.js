@@ -145,7 +145,7 @@ define(['jquery', 'app'], function($, App) {
     		}
     		
     		$('.play div').click(function(event) {
-                var nameFromInput = $('#nameinput').attr('value'),
+                var nameFromInput = $('#nameinput').val(),
                     nameFromStorage = $('#playername').html(),
                     name = nameFromInput || nameFromStorage;
                 
@@ -349,7 +349,7 @@ define(['jquery', 'app'], function($, App) {
 
             $('#nameinput').keypress(function(event) {
                 var $name = $('#nameinput'),
-                    name = $name.attr('value');
+                    name = $name.val();
 
                 if(event.keyCode === 13) {
                     if(name !== '') {

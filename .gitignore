@@ -2,9 +2,11 @@ node_modules
 client-build
 build.txt
 config_build.json
+!client/config/config_build.json
 config_local*
 client/audio/music
 .DS_Store
 *.swp
 .idea
 HOME
+.amp/portals/

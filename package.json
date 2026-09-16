@@ -2,6 +2,13 @@
     "name": "BrowserQuest",
     "version": "0.0.1",
     "private": false,
+    "scripts": {
+        "start": "node server/js/main.js",
+        "dev": "node tools/dev-server.js"
+    },
+    "engines": {
+        "node": ">=22"
+    },
     "dependencies": {
         "0d": "^0.0.1",
         "bison": "^1.1.1",

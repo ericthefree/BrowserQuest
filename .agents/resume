@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+[[ -d node_modules ]] || {
+    echo "node_modules is missing; rerun .agents/setup." >&2
+    exit 1
+}
+
+echo "BrowserQuest orb is ready. Run 'amp orb services ensure' to start the game portal."

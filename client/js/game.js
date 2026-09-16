@@ -613,10 +613,11 @@ function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedT
             }
         },
     
-        setServerOptions: function(host, port, username) {
+        setServerOptions: function(host, port, username, secure) {
             this.host = host;
             this.port = port;
             this.username = username;
+            this.secure = secure;
         },
     
         loadAudio: function() {
@@ -718,7 +719,7 @@ function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedT
             var self = this,
                 connecting = false; // always in dispatcher mode in the build version
     
-            this.client = new GameClient(this.host, this.port);
+            this.client = new GameClient(this.host, this.port, this.secure);
             
             //>>excludeStart("prodHost", pragmas.prodHost);
             var config = this.app.config.local || this.app.config.dev;

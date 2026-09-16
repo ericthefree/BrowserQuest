@@ -1,8 +1,16 @@
 
 define(['text!../config/config_build.json'],
 function(build) {
+    var runtime = window.BROWSERQUEST_SERVER || {},
+        pagePort = window.location.port ? parseInt(window.location.port, 10) : null;
+
     var config = {
-        dev: { host: "localhost", port: 8000, dispatcher: false },
+        dev: {
+            host: runtime.host || window.location.hostname || "localhost",
+            port: runtime.port !== undefined ? runtime.port : pagePort,
+            secure: runtime.secure !== undefined ? runtime.secure : window.location.protocol === "https:",
+            dispatcher: false
+        },
         build: JSON.parse(build)
     };
     
