@@ -797,7 +797,11 @@ function(Camera, Item, Character, Player, Timer) {
             // Map.computeReachableRegion) are intentionally left undrawn,
             // and a transparent gap would let #background's CSS loading
             // image show through underneath the canvas.
-            this.background.fillStyle = "#000";
+            // Interior maps use tile 4's dark backdrop around each isolated
+            // room. Continue that color through unused widescreen space so
+            // the room reads as one centered scene rather than a scene with
+            // an unrelated black strip below it.
+            this.background.fillStyle = this.game.isInInterior ? "#25221b" : "#000";
             this.background.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
             this.background.save();

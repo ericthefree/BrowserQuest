@@ -45,6 +45,22 @@ define(function() {
             this.setPosition(x, y);
         },
 
+        // Interiors were laid out around the original 30x14 desktop camera.
+        // Recreate that room-sized zone. Center it horizontally in wider
+        // landscape viewports, while retaining the authored vertical origin;
+        // the two added rows frame the room evenly above and below.
+        focusEntityInArea: function(entity, width, height) {
+            var innerWidth = width - 2,
+                innerHeight = height - 2,
+                x = Math.floor((entity.gridX - 1) / innerWidth) * innerWidth,
+                y = Math.floor((entity.gridY - 1) / innerHeight) * innerHeight;
+
+            this.setGridPosition(
+                Math.round(x - ((this.gridW - width) / 2)),
+                y
+            );
+        },
+
         forEachVisiblePosition: function(callback, extra) {
             var extra = extra || 0;
             for(var y=this.gridY-extra, maxY=this.gridY+this.gridH+(extra*2); y < maxY; y += 1) {

@@ -956,16 +956,20 @@ function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedT
                         self.player.nextGridY = dest.y;
                         self.player.turnTo(dest.orientation);
                         self.client.sendTeleport(dest.x, dest.y);
-                        
-                        if(dest.portal) {
+
+                        self.isInInterior = !dest.portal &&
+                            !_.isUndefined(dest.cameraX) && !_.isUndefined(dest.cameraY);
+
+                        if(self.isInInterior) {
+                            // A camera destination marks an interior. Restore
+                            // the original 30x14 room zone and center it in
+                            // today's responsive camera instead of centering
+                            // on the doorway, which pins the room to an edge.
+                            self.camera.focusEntityInArea(self.player, 30, 14);
+                            self.resetZone();
+                        } else if(dest.portal) {
                             self.assignBubbleTo(self.player);
                         } else {
-                            // Center on the player rather than snapping to a
-                            // zone-aligned position: the camera is now
-                            // dynamically sized to fill the window, so a
-                            // room (usually much smaller than the camera)
-                            // needs to be actively centered, not just
-                            // whichever zone cell it happens to land in.
                             self.camera.lookAt(self.player);
                             self.resetZone();
                         }
