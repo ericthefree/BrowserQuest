@@ -20,14 +20,14 @@ define(['lib/astar'], function(AStar) {
             }
         },
     
-        findPath: function(grid, entity, x, y, findIncomplete) {
+        findPath: function(grid, entity, x, y, findIncomplete, movementMode) {
             var start = [entity.gridX, entity.gridY],
         		end = [x, y],
         		path;
 
             this.grid = grid;
         	this.applyIgnoreList_(true);
-            path = AStar(this.grid, start, end);
+            path = AStar(this.grid, start, end, movementMode);
         
             if(path.length === 0 && findIncomplete === true) {
                 // If no path was found, try and find an incomplete one

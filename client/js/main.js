@@ -253,12 +253,17 @@ define(['jquery', 'app'], function($, App) {
         	if(game.renderer.mobile || game.renderer.tablet) {
                 var touchOrigin = null,
                     touchDirection = null,
-                    touchAccumulator = { x: 0, y: 0 },
+                    touchAccumulator = { diagonal: 0, straight: 0 },
                     touchMoveTimer = null,
                     touchDeadZone = 16;
 
                 function movePlayerInTouchDirection() {
                     var player = game.player,
+                        absX,
+                        absY,
+                        diagonalWeight,
+                        straightWeight,
+                        moveDiagonally,
                         stepX = 0,
                         stepY = 0,
                         x,
@@ -268,14 +273,25 @@ define(['jquery', 'app'], function($, App) {
                         return;
                     }
 
-                    touchAccumulator.x += Math.abs(touchDirection.x);
-                    touchAccumulator.y += Math.abs(touchDirection.y);
-                    if(touchAccumulator.x >= touchAccumulator.y) {
+                    absX = Math.abs(touchDirection.x);
+                    absY = Math.abs(touchDirection.y);
+                    diagonalWeight = Math.min(absX, absY) / Math.max(absX, absY);
+                    straightWeight = 1 - diagonalWeight;
+                    touchAccumulator.diagonal += diagonalWeight;
+                    touchAccumulator.straight += straightWeight;
+                    moveDiagonally = touchAccumulator.diagonal >= touchAccumulator.straight;
+
+                    if(moveDiagonally) {
                         stepX = touchDirection.x > 0 ? 1 : -1;
-                        touchAccumulator.x -= 1;
-                    } else {
                         stepY = touchDirection.y > 0 ? 1 : -1;
-                        touchAccumulator.y -= 1;
+                        touchAccumulator.diagonal -= 1;
+                    } else {
+                        if(absX > absY) {
+                            stepX = touchDirection.x > 0 ? 1 : -1;
+                        } else {
+                            stepY = touchDirection.y > 0 ? 1 : -1;
+                        }
+                        touchAccumulator.straight -= 1;
                     }
 
                     x = player.isMoving() ? player.nextGridX : player.gridX;
@@ -293,7 +309,7 @@ define(['jquery', 'app'], function($, App) {
 
                     touchOrigin = { x: touch.pageX, y: touch.pageY };
                     touchDirection = null;
-                    touchAccumulator = { x: 0, y: 0 };
+                    touchAccumulator = { diagonal: 0, straight: 0 };
                     clearInterval(touchMoveTimer);
                     touchMoveTimer = null;
                 }).on('touchmove', function(event) {
@@ -322,19 +338,19 @@ define(['jquery', 'app'], function($, App) {
                     if(previousDirection &&
                        ((previousDirection.x < 0) !== (touchDirection.x < 0) ||
                         (previousDirection.y < 0) !== (touchDirection.y < 0))) {
-                        touchAccumulator = { x: 0, y: 0 };
+                        touchAccumulator = { diagonal: 0, straight: 0 };
                     }
 
                     if(!touchMoveTimer) {
                         movePlayerInTouchDirection();
-                        touchMoveTimer = setInterval(movePlayerInTouchDirection, 120);
+                        touchMoveTimer = setInterval(movePlayerInTouchDirection, 140);
                     }
                 }).on('touchend touchcancel', function() {
                     var wasDragging = !!touchDirection;
 
                     touchOrigin = null;
                     touchDirection = null;
-                    touchAccumulator = { x: 0, y: 0 };
+                    touchAccumulator = { diagonal: 0, straight: 0 };
                     clearInterval(touchMoveTimer);
                     touchMoveTimer = null;
 

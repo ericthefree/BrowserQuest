@@ -1846,7 +1846,9 @@ function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedT
                     });
                 }
             
-                path = this.pathfinder.findPath(grid, character, x, y, false);
+                path = this.pathfinder.findPath(
+                    grid, character, x, y, false, isPlayer ? "Diagonal" : false
+                );
             
                 if(ignoreList) {
                     this.pathfinder.clearIgnoreList();

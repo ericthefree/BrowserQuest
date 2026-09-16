@@ -11,8 +11,8 @@ define(['character', 'exceptions'], function(Character, Exceptions) {
 
             // Slightly gentler movement feels more controllable with touch
             // steering while preserving the game's overall pace.
-            this.moveSpeed = 135;
-            this.walkSpeed = 110;
+            this.moveSpeed = 150;
+            this.walkSpeed = 120;
         
             // Renderer
      		this.nameOffsetY = -10;

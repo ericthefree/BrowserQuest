@@ -127,72 +127,37 @@ define(['character', 'timer'], function(Character, Timer) {
         },
 
         updateCharacter: function(c) {
-            var self = this;
-    
-            // Estimate of the movement distance for one update
-            var tick = Math.round(16 / Math.round((c.moveSpeed / (1000 / this.game.renderer.FPS))));
-    
+            var tick = Math.round(16 / Math.round((c.moveSpeed / (1000 / this.game.renderer.FPS)))),
+                startX,
+                startY,
+                deltaX,
+                deltaY,
+                distance,
+                duration;
+
             if(c.isMoving() && c.movement.inProgress === false) {
-                if(c.orientation === Types.Orientations.LEFT) {
-                    c.movement.start(this.game.currentTime,
-                                     function(x) {
-                                        c.x = x;
-                                        c.hasMoved();
-                                     },
-                                     function() {
-                                        c.x = c.movement.endValue;
-                                        c.hasMoved();
-                                        c.nextStep();
-                                     },
-                                     c.x - tick,
-                                     c.x - 16,
-                                     c.moveSpeed);
-                }
-                else if(c.orientation === Types.Orientations.RIGHT) {
-                    c.movement.start(this.game.currentTime,
-                                     function(x) {
-                                        c.x = x;
-                                        c.hasMoved();
-                                     },
-                                     function() {
-                                        c.x = c.movement.endValue;
-                                        c.hasMoved();
-                                        c.nextStep();
-                                     },
-                                     c.x + tick,
-                                     c.x + 16,
-                                     c.moveSpeed);
-                }
-                else if(c.orientation === Types.Orientations.UP) {
-                    c.movement.start(this.game.currentTime,
-                                     function(y) {
-                                        c.y = y;
-                                        c.hasMoved();
-                                     },
-                                     function() {
-                                        c.y = c.movement.endValue;
-                                        c.hasMoved();
-                                        c.nextStep();
-                                     },
-                                     c.y - tick,
-                                     c.y - 16,
-                                     c.moveSpeed);
-                }
-                else if(c.orientation === Types.Orientations.DOWN) {
-                    c.movement.start(this.game.currentTime,
-                                     function(y) {
-                                        c.y = y;
-                                        c.hasMoved();
-                                     },
-                                     function() {
-                                        c.y = c.movement.endValue;
-                                        c.hasMoved();
-                                        c.nextStep();
-                                     },
-                                     c.y + tick,
-                                     c.y + 16,
-                                     c.moveSpeed);
-                }
+                startX = c.x;
+                startY = c.y;
+                deltaX = (c.nextGridX - c.gridX) * 16;
+                deltaY = (c.nextGridY - c.gridY) * 16;
+                distance = Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
+                duration = c.moveSpeed * (distance / 16);
+
+                c.movement.start(this.game.currentTime,
+                                 function(progress) {
+                                    c.x = Math.round(startX + (deltaX * progress / 1000));
+                                    c.y = Math.round(startY + (deltaY * progress / 1000));
+                                    c.hasMoved();
+                                 },
+                                 function() {
+                                    c.x = startX + deltaX;
+                                    c.y = startY + deltaY;
+                                    c.hasMoved();
+                                    c.nextStep();
+                                 },
+                                 Math.round((tick / 16) * 1000),
+                                 1000,
+                                 duration);
             }
         },
 
