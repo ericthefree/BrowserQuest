@@ -3,11 +3,16 @@ define(function() {
 
     var Storage = Class.extend({
         init: function() {
-            if(this.hasLocalStorage() && localStorage.data) {
-                this.data = JSON.parse(localStorage.data);
-            } else {
+            var saved = window.BROWSERQUEST_CLOUD_SAVE || (this.hasLocalStorage() && localStorage.data);
+            try {
+                this.data = saved ? JSON.parse(saved) : null;
+            } catch(e) {
+                this.data = null;
+            }
+            if(!this.data) {
                 this.resetData();
             }
+            this.save();
         },
     
         resetData: function() {
@@ -38,12 +43,16 @@ define(function() {
             if(this.hasLocalStorage()) {
                 localStorage.data = JSON.stringify(this.data);
             }
+            if(window.BrowserQuestCloud) {
+                window.BrowserQuestCloud.save(JSON.stringify(this.data), JSON.stringify(window.BROWSERQUEST_OFFLINE_WORLD || {}));
+            }
         },
     
         clear: function() {
             if(this.hasLocalStorage()) {
                 localStorage.data = "";
                 this.resetData();
+                this.save();
             }
         },
     

@@ -3,14 +3,16 @@ import WebKit
 
 final class GameViewController: UIViewController, WKNavigationDelegate {
     private var webView: WKWebView!
+    private let saveBridge = ICloudSaveBridge()
 
     override func loadView() {
         let configuration = WKWebViewConfiguration()
         configuration.allowsInlineMediaPlayback = true
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+        configuration.userContentController.add(saveBridge, name: "browserQuestCloud")
         configuration.userContentController.addUserScript(
             WKUserScript(
-                source: serverConfigurationScript(),
+                source: saveBridge.bootstrapScript,
                 injectionTime: .atDocumentStart,
                 forMainFrameOnly: true
             )
@@ -47,29 +49,6 @@ final class GameViewController: UIViewController, WKNavigationDelegate {
         }
 
         webView.loadFileURL(index, allowingReadAccessTo: resources)
-    }
-
-    private func serverConfigurationScript() -> String {
-        let configured = Bundle.main.object(forInfoDictionaryKey: "BrowserQuestServerURL") as? String
-        let rawURL = configured ?? "ws://localhost:8000"
-        guard let url = URL(string: rawURL), let host = url.host else {
-            return "window.BROWSERQUEST_SERVER = { host: 'localhost', port: 8000, secure: false };"
-        }
-
-        let secure = url.scheme?.lowercased() == "wss"
-        let defaultPort = secure ? 443 : 80
-        let payload: [String: Any] = [
-            "host": host,
-            "port": url.port ?? defaultPort,
-            "secure": secure
-        ]
-        guard
-            let data = try? JSONSerialization.data(withJSONObject: payload),
-            let json = String(data: data, encoding: .utf8)
-        else {
-            return ""
-        }
-        return "window.BROWSERQUEST_SERVER = \(json);"
     }
 
     private func showLoadError() {

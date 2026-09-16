@@ -1,14 +1,14 @@
 # BrowserQuest for iOS
 
-This project packages the existing HTML5 client in a native `WKWebView`. The multiplayer server remains the Node.js service in `server/`; it is not embedded in the app.
+This project packages the HTML5 client in a native `WKWebView` and runs a local single-player world simulation. The iOS app does not require the Node.js server or a network connection to play.
 
 ## Run in Xcode
 
 1. Open `BrowserQuest.xcodeproj` in Xcode 15 or newer.
 2. Select the **BrowserQuest** scheme and an iPhone or iPad simulator.
-3. Start the game server from the repository root with `npm start`.
+3. Select the BrowserQuest target, choose your development team under **Signing & Capabilities**, and ensure the iCloud capability has **Key-value storage** enabled.
 4. Run the app.
 
-The checked-in development setting connects to `ws://localhost:8000`, which works in the iOS Simulator. For a physical device, change `BrowserQuestServerURL` in `BrowserQuest/Info.plist` to a server the device can reach, such as `ws://192.168.1.10:8000`. Use `wss://` for distributed builds.
+Character identity, equipment, achievements, and the latest checkpoint are saved through `NSUbiquitousKeyValueStore`. iCloud data is restored when the app starts. The web client also retains its local save, so gameplay still works when iCloud is unavailable.
 
 The `client` and `shared` directories are Xcode folder references. Changes to web assets are therefore picked up without manually editing the project file.

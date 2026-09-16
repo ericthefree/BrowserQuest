@@ -1,9 +1,9 @@
 
 define(['infomanager', 'bubble', 'renderer', 'map', 'animation', 'sprite', 'tile',
-        'warrior', 'gameclient', 'audio', 'updater', 'transition', 'pathfinder',
+        'warrior', 'gameclient', 'localgameclient', 'audio', 'updater', 'transition', 'pathfinder',
         'item', 'mob', 'npc', 'player', 'character', 'chest', 'mobs', 'exceptions', 'config', '../../shared/js/gametypes'],
 function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedTile,
-         Warrior, GameClient, AudioManager, Updater, Transition, Pathfinder,
+         Warrior, GameClient, LocalGameClient, AudioManager, Updater, Transition, Pathfinder,
          Item, Mob, Npc, Player, Character, Chest, Mobs, Exceptions, config) {
     
     var Game = Class.extend({
@@ -719,7 +719,7 @@ function(InfoManager, BubbleManager, Renderer, Map, Animation, Sprite, AnimatedT
             var self = this,
                 connecting = false; // always in dispatcher mode in the build version
     
-            this.client = new GameClient(this.host, this.port, this.secure);
+            this.client = window.BROWSERQUEST_OFFLINE ? new LocalGameClient() : new GameClient(this.host, this.port, this.secure);
             
             //>>excludeStart("prodHost", pragmas.prodHost);
             var config = this.app.config.local || this.app.config.dev;

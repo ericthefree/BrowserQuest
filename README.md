@@ -24,8 +24,8 @@ iOS
 ---
 
 An Xcode project that packages the web client with `WKWebView` is available in
-`ios/BrowserQuest.xcodeproj`. See `ios/README.md` for simulator, device, and
-server configuration instructions.
+`ios/BrowserQuest.xcodeproj`. It runs as an offline single-player game and
+syncs saves through iCloud. See `ios/README.md` for signing and iCloud setup.
 
 
 Documentation
