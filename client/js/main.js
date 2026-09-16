@@ -251,11 +251,76 @@ define(['jquery', 'app'], function($, App) {
     		$('#chatbox').attr('value', '');
     		
         	if(game.renderer.mobile || game.renderer.tablet) {
+                var touchOrigin = null,
+                    touchDirection = null,
+                    touchMoveTimer = null,
+                    touchDeadZone = 16;
+
+                function movePlayerInTouchDirection() {
+                    var player = game.player,
+                        x,
+                        y;
+
+                    if(!touchDirection || !game.started || !player || player.isDead || game.isZoning()) {
+                        return;
+                    }
+
+                    x = player.isMoving() ? player.nextGridX : player.gridX;
+                    y = player.isMoving() ? player.nextGridY : player.gridY;
+                    game.makePlayerGoTo(x + touchDirection.x, y + touchDirection.y);
+                }
+
                 $('#foreground').on('touchstart', function(event) {
+                    var touch = event.originalEvent.touches[0];
+
                     app.center();
-                    app.setMouseCoordinates(event.originalEvent.touches[0]);
+                    app.setMouseCoordinates(touch);
                 	game.click();
                 	app.hideWindows();
+
+                    touchOrigin = { x: touch.pageX, y: touch.pageY };
+                    touchDirection = null;
+                    clearInterval(touchMoveTimer);
+                    touchMoveTimer = null;
+                }).on('touchmove', function(event) {
+                    var touch,
+                        dx,
+                        dy;
+
+                    if(!touchOrigin) {
+                        return;
+                    }
+
+                    touch = event.originalEvent.touches[0];
+                    dx = touch.pageX - touchOrigin.x;
+                    dy = touch.pageY - touchOrigin.y;
+
+                    if(Math.abs(dx) < touchDeadZone && Math.abs(dy) < touchDeadZone) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    if(Math.abs(dx) > Math.abs(dy)) {
+                        touchDirection = { x: dx > 0 ? 1 : -1, y: 0 };
+                    } else {
+                        touchDirection = { x: 0, y: dy > 0 ? 1 : -1 };
+                    }
+
+                    if(!touchMoveTimer) {
+                        movePlayerInTouchDirection();
+                        touchMoveTimer = setInterval(movePlayerInTouchDirection, 100);
+                    }
+                }).on('touchend touchcancel', function() {
+                    var wasDragging = !!touchDirection;
+
+                    touchOrigin = null;
+                    touchDirection = null;
+                    clearInterval(touchMoveTimer);
+                    touchMoveTimer = null;
+
+                    if(wasDragging && game.player) {
+                        game.player.stop();
+                    }
                 });
             } else {
                 $('#foreground').click(function(event) {
