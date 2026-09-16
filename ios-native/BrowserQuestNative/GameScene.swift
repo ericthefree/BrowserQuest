@@ -22,6 +22,14 @@ final class GameScene: SKScene {
     private var lastUpdateTime: TimeInterval = 0
     private var lastDoorTime: TimeInterval = 0
     private var lastCheckpointID: Int?
+    private var blockedDoorDestination: GridPoint?
+    private var interiorOrigin: GridPoint?
+    private var facingDirection = "down"
+    private var facingFlipped = false
+    private var attackTargetID: String?
+    private var playerPathStep: GridPoint?
+    private var lastPlayerPathTime: TimeInterval = 0
+    private var lastPlayerAttackTime: TimeInterval = 0
 
     private let healthLabel = SKLabelNode(fontNamed: "Courier-Bold")
     private let messageLabel = SKLabelNode(fontNamed: "Courier-Bold")
@@ -49,9 +57,9 @@ final class GameScene: SKScene {
     private func buildWorld() {
         addChild(worldNode)
         let layers = TileMapRenderer.makeLayers(map: map, tileSize: tileSize)
-        worldNode.addChild(layers.ground)
-        worldNode.addChild(layers.detail)
-        worldNode.addChild(layers.overhead)
+        for layer in layers.nodes {
+            worldNode.addChild(layer)
+        }
 
         save = saveStore.load()
         let checkpoint = map.checkpoints.first { $0.id == save.checkpointID }
@@ -155,6 +163,8 @@ final class GameScene: SKScene {
         let length = hypot(dx, dy)
         guard length > 14 else { return }
         touchMoved = true
+        attackTargetID = nil
+        playerPathStep = nil
         movement = CGVector(dx: dx / length, dy: dy / length)
     }
 
@@ -178,6 +188,7 @@ final class GameScene: SKScene {
         let deltaTime = lastUpdateTime == 0 ? 0 : min(currentTime - lastUpdateTime, 1 / 20)
         lastUpdateTime = currentTime
         updatePlayer(deltaTime: deltaTime, currentTime: currentTime)
+        updateAttackTarget(deltaTime: deltaTime, currentTime: currentTime)
         updateMobs(deltaTime: deltaTime, currentTime: currentTime)
         updateCamera()
         updateCheckpoint()
@@ -199,6 +210,52 @@ final class GameScene: SKScene {
         collectNearbyItems()
     }
 
+    private func updateAttackTarget(deltaTime: TimeInterval, currentTime: TimeInterval) {
+        guard movement.dx == 0, movement.dy == 0, let targetID = attackTargetID,
+              let mob = entities[targetID], mob.role == .mob else { return }
+        let distance = mob.node.position.distance(to: player.node.position)
+        if distance < tileSize * 2.2 {
+            if currentTime - lastPlayerAttackTime > 0.6 {
+                lastPlayerAttackTime = currentTime
+                attack(mob)
+            }
+            return
+        }
+
+        if currentTime - lastPlayerPathTime > 0.2 || playerPathStep == nil {
+            let start = map.gridPosition(at: player.node.position, tileSize: tileSize)
+            let goal = map.gridPosition(at: mob.node.position, tileSize: tileSize)
+            playerPathStep = Pathfinder.nextStep(from: start, to: goal, on: map)
+            lastPlayerPathTime = currentTime
+        }
+        guard let nextStep = playerPathStep else {
+            attackTargetID = nil
+            showMessage("No path to \(mob.kind).")
+            return
+        }
+        let waypoint = map.worldPoint(x: nextStep.x, y: nextStep.y, tileSize: tileSize)
+        let dx = waypoint.x - player.node.position.x
+        let dy = waypoint.y - player.node.position.y
+        let waypointDistance = hypot(dx, dy)
+        guard waypointDistance > 0 else {
+            playerPathStep = nil
+            return
+        }
+        let step = playerSpeed * CGFloat(deltaTime)
+        let candidate = waypointDistance <= step
+            ? waypoint
+            : CGPoint(x: player.node.position.x + (dx / waypointDistance) * step,
+                      y: player.node.position.y + (dy / waypointDistance) * step)
+        if canOccupy(candidate) {
+            player.node.position = candidate
+            movement = CGVector(dx: dx / waypointDistance, dy: dy / waypointDistance)
+            setPlayerAnimation(moving: true)
+            movement = .zero
+            collectNearbyItems()
+        }
+        if waypointDistance <= step { playerPathStep = nil }
+    }
+
     private func canOccupy(_ point: CGPoint) -> Bool {
         let radius: CGFloat = 7
         return [CGPoint(x: point.x - radius, y: point.y - radius),
@@ -211,28 +268,57 @@ final class GameScene: SKScene {
     }
 
     private func setPlayerAnimation(moving: Bool) {
-        let horizontal = abs(movement.dx) > abs(movement.dy)
-        let direction: String
-        if horizontal {
-            direction = "right"
-        } else {
-            direction = movement.dy >= 0 ? "up" : "down"
+        if moving {
+            let horizontal = abs(movement.dx) > abs(movement.dy)
+            if horizontal {
+                facingDirection = "right"
+                facingFlipped = movement.dx < 0
+            } else {
+                facingDirection = movement.dy >= 0 ? "up" : "down"
+                facingFlipped = false
+            }
         }
         spriteFactory.animate(player.node, kind: save.armor,
-                              animation: "\(moving ? "walk" : "idle")_\(direction)",
-                              flipped: horizontal && movement.dx < 0)
+                              animation: "\(moving ? "walk" : "idle")_\(facingDirection)",
+                              flipped: facingFlipped)
     }
 
     private func handleDoor(currentTime: TimeInterval) {
         guard currentTime - lastDoorTime > 0.65 else { return }
         let grid = map.gridPosition(at: player.node.position, tileSize: tileSize)
+        if grid == blockedDoorDestination { return }
+        blockedDoorDestination = nil
         guard let door = map.door(x: grid.x, y: grid.y) else { return }
         player.node.position = map.worldPoint(x: door.tx, y: door.ty, tileSize: tileSize)
+        blockedDoorDestination = GridPoint(x: door.tx, y: door.ty)
+        if door.p == 0, door.tcx != nil, door.tcy != nil {
+            let innerWidth = 28
+            let innerHeight = 12
+            interiorOrigin = GridPoint(
+                x: ((door.tx - 1) / innerWidth) * innerWidth,
+                y: ((door.ty - 1) / innerHeight) * innerHeight
+            )
+        } else {
+            interiorOrigin = nil
+        }
         lastDoorTime = currentTime
         audio.play(door.p == 1 ? "teleport" : "npc-end")
     }
 
     private func updateCamera() {
+        if let origin = interiorOrigin {
+            let roomWidth: CGFloat = 30
+            let roomHeight: CGFloat = 14
+            let scale = max((roomWidth * tileSize) / max(size.width, 1),
+                            (roomHeight * tileSize) / max(size.height, 1))
+            gameCamera.setScale(scale)
+            gameCamera.position = CGPoint(
+                x: (CGFloat(origin.x) + roomWidth / 2) * tileSize,
+                y: (CGFloat(map.height - origin.y) - roomHeight / 2) * tileSize
+            )
+            return
+        }
+        gameCamera.setScale(1)
         let halfWidth = size.width / 2
         let halfHeight = size.height / 2
         let worldWidth = CGFloat(map.width) * tileSize
@@ -281,13 +367,21 @@ final class GameScene: SKScene {
     }
 
     private func interact(at scenePoint: CGPoint) {
-        let worldPoint = convert(scenePoint, to: worldNode)
-        let candidates = entities.values.filter { $0.role != .player && $0.node.position.distance(to: worldPoint) < 44 }
+        let worldPoint = worldNode.convert(scenePoint, from: self)
+        let candidates = entities.values.filter {
+            guard $0.role != .player else { return false }
+            let hitArea = $0.node.frame.insetBy(dx: -20, dy: -20)
+            let fallbackRadius = max($0.node.size.width, $0.node.size.height) / 2 + 24
+            return hitArea.contains(worldPoint) || $0.node.position.distance(to: worldPoint) < fallbackRadius
+        }
         guard let target = candidates.min(by: {
             $0.node.position.distance(to: worldPoint) < $1.node.position.distance(to: worldPoint)
         }) else { return }
         switch target.role {
-        case .mob: attack(target)
+        case .mob:
+            attackTargetID = target.id
+            playerPathStep = nil
+            showMessage("Targeting \(target.kind).")
         case .npc:
             audio.play("npctalk")
             showMessage("\(target.kind.capitalized): Welcome, adventurer!")
@@ -302,18 +396,36 @@ final class GameScene: SKScene {
     }
 
     private func attack(_ mob: EntityModel) {
-        guard mob.node.position.distance(to: player.node.position) < tileSize * 1.6 else {
+        guard mob.node.position.distance(to: player.node.position) < tileSize * 2.2 else {
             showMessage("Move closer to attack.")
             return
         }
+        let dx = mob.node.position.x - player.node.position.x
+        let dy = mob.node.position.y - player.node.position.y
+        if abs(dx) > abs(dy) {
+            facingDirection = "right"
+            facingFlipped = dx < 0
+        } else {
+            facingDirection = dy >= 0 ? "up" : "down"
+            facingFlipped = false
+        }
         mob.hitPoints -= player.attackPower
+        spriteFactory.animate(player.node, kind: save.armor,
+                              animation: "atk_\(facingDirection)", flipped: facingFlipped)
         audio.play("hit1")
         if mob.hitPoints <= 0 {
             mob.node.removeFromParent()
             entities.removeValue(forKey: mob.id)
+            attackTargetID = nil
+            playerPathStep = nil
             audio.play("kill1")
             showMessage("Defeated \(mob.kind).")
+        } else {
+            showMessage("Hit \(mob.kind): \(mob.hitPoints)/\(mob.maxHitPoints)")
         }
+        player.node.run(.sequence([.wait(forDuration: 0.45), .run { [weak self] in
+            self?.setPlayerAnimation(moving: false)
+        }]), withKey: "return-to-idle")
     }
 
     private func collectNearbyItems() {

@@ -16,16 +16,17 @@ The game still runs without an iCloud account. Saves always go to `UserDefaults`
 
 ## Controls
 
+- Create, start, or delete your iCloud-synced character from the opening screen.
 - Drag anywhere and hold to move in any direction. Collision resolution allows the player to slide along walls.
-- Tap a nearby enemy to attack it.
+- Tap an enemy to path toward it and keep attacking; its remaining health appears at the bottom of the screen.
 - Tap an NPC or chest to interact.
 - Walk over an item to collect it.
 
 ## Native systems
 
-- SpriteKit tile-map rendering, including stacked, overhead, and animated tiles
+- SpriteKit tile-map rendering, preserving all stacked, overhead, and animated tiles
 - Original world collision map, doors, teleports, and checkpoints
-- Continuous analog movement and a camera that follows the player
+- Continuous analog movement, an outdoor follow camera, and room-sized interior framing
 - Native sprite-sheet animation for the player, enemies, NPCs, items, and chests
 - Static and roaming world entities loaded from the original server map
 - Grid pathfinding, enemy pursuit, combat, damage, death, and checkpoint revival

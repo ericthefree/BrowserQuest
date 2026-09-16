@@ -22,6 +22,7 @@
 		B1000000000000000000000E /* SpriteKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000010 /* SpriteKit.framework */; };
 		B1000000000000000000000F /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20000000000000000000011 /* AVFoundation.framework */; };
 		B10000000000000000000010 /* Pathfinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000013 /* Pathfinder.swift */; };
+		B10000000000000000000011 /* MenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000014 /* MenuScene.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,7 @@
 		B20000000000000000000011 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		B20000000000000000000012 /* BrowserQuestNative.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrowserQuestNative.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20000000000000000000013 /* Pathfinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pathfinder.swift; sourceTree = "<group>"; };
+		B20000000000000000000014 /* MenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuScene.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +79,7 @@
 				B20000000000000000000002 /* SceneDelegate.swift */,
 				B20000000000000000000003 /* GameViewController.swift */,
 				B20000000000000000000004 /* GameScene.swift */,
+				B20000000000000000000014 /* MenuScene.swift */,
 				B20000000000000000000005 /* MapModel.swift */,
 				B20000000000000000000013 /* Pathfinder.swift */,
 				B20000000000000000000006 /* TileMapRenderer.swift */,
@@ -170,6 +173,7 @@
 				B10000000000000000000002 /* SceneDelegate.swift in Sources */,
 				B10000000000000000000003 /* GameViewController.swift in Sources */,
 				B10000000000000000000004 /* GameScene.swift in Sources */,
+				B10000000000000000000011 /* MenuScene.swift in Sources */,
 				B10000000000000000000005 /* MapModel.swift in Sources */,
 				B10000000000000000000010 /* Pathfinder.swift in Sources */,
 				B10000000000000000000006 /* TileMapRenderer.swift in Sources */,

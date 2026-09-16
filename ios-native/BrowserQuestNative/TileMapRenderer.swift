@@ -1,9 +1,7 @@
 import SpriteKit
 
 struct TileLayers {
-    let ground: SKTileMapNode
-    let detail: SKTileMapNode
-    let overhead: SKTileMapNode
+    let nodes: [SKTileMapNode]
 }
 
 enum TileMapRenderer {
@@ -59,28 +57,29 @@ enum TileMapRenderer {
             return node
         }
 
-        let ground = layer(z: 0)
-        let detail = layer(z: 5)
-        let overhead = layer(z: 100)
         let high = Set(map.high)
+        let maxGroundLayers = map.data.map { cell in cell.tileIDs.filter { !high.contains($0) }.count }.max() ?? 1
+        let maxOverheadLayers = map.data.map { cell in cell.tileIDs.filter { high.contains($0) }.count }.max() ?? 1
+        let groundLayers = (0..<maxGroundLayers).map { layer(z: CGFloat($0) * 5) }
+        let overheadLayers = (0..<maxOverheadLayers).map { layer(z: 100 + CGFloat($0)) }
 
         for (index, cell) in map.data.enumerated() {
             let column = index % map.width
             let row = map.height - 1 - (index / map.width)
-            var lowLayer = 0
+            var groundIndex = 0
+            var overheadIndex = 0
             for id in cell.tileIDs {
                 guard let group = groups[id] else { continue }
                 if high.contains(id) {
-                    overhead.setTileGroup(group, forColumn: column, row: row)
-                } else if lowLayer == 0 {
-                    ground.setTileGroup(group, forColumn: column, row: row)
-                    lowLayer += 1
+                    overheadLayers[overheadIndex].setTileGroup(group, forColumn: column, row: row)
+                    overheadIndex += 1
                 } else {
-                    detail.setTileGroup(group, forColumn: column, row: row)
+                    groundLayers[groundIndex].setTileGroup(group, forColumn: column, row: row)
+                    groundIndex += 1
                 }
             }
         }
 
-        return TileLayers(ground: ground, detail: detail, overhead: overhead)
+        return TileLayers(nodes: groundLayers + overheadLayers)
     }
 }
