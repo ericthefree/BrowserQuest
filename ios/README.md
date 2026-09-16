@@ -11,4 +11,6 @@ This project packages the HTML5 client in a native `WKWebView` and runs a local 
 
 Character identity, equipment, achievements, and the latest checkpoint are saved through `NSUbiquitousKeyValueStore`. iCloud data is restored when the app starts. The web client also retains its local save, so gameplay still works when iCloud is unavailable.
 
+Bundled game files are served to `WKWebView` through the app's private `browserquest://` URL scheme. This avoids device sandbox-extension failures from direct `file://` loading. JavaScript and navigation failures are printed in Xcode with a `[BrowserQuest JS]` or `[BrowserQuest navigation]` prefix.
+
 The `client` and `shared` directories are Xcode folder references. Changes to web assets are therefore picked up without manually editing the project file.

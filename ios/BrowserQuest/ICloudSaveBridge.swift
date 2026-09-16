@@ -26,10 +26,31 @@ final class ICloudSaveBridge: NSObject, WKScriptMessageHandler {
                 window.webkit.messageHandlers.browserQuestCloud.postMessage({ save: save, world: world });
             }
         };
+        (function() {
+            function report(kind, message) {
+                window.webkit.messageHandlers.browserQuestLog.postMessage(kind + ": " + message);
+            }
+            var originalError = console.error;
+            console.error = function() {
+                var message = Array.prototype.map.call(arguments, String).join(" ");
+                report("console.error", message);
+                originalError.apply(console, arguments);
+            };
+            window.addEventListener("error", function(event) {
+                report("window.error", event.message + " at " + event.filename + ":" + event.lineno);
+            });
+            window.addEventListener("unhandledrejection", function(event) {
+                report("unhandledrejection", String(event.reason));
+            });
+        }());
         """
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        if message.name == "browserQuestLog" {
+            print("[BrowserQuest JS] \(message.body)")
+            return
+        }
         guard
             message.name == "browserQuestCloud",
             let body = message.body as? [String: Any]

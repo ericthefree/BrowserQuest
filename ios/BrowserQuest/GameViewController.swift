@@ -4,12 +4,15 @@ import WebKit
 final class GameViewController: UIViewController, WKNavigationDelegate {
     private var webView: WKWebView!
     private let saveBridge = ICloudSaveBridge()
+    private let bundleSchemeHandler = BundleSchemeHandler()
 
     override func loadView() {
         let configuration = WKWebViewConfiguration()
         configuration.allowsInlineMediaPlayback = true
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+        configuration.setURLSchemeHandler(bundleSchemeHandler, forURLScheme: "browserquest")
         configuration.userContentController.add(saveBridge, name: "browserQuestCloud")
+        configuration.userContentController.add(saveBridge, name: "browserQuestLog")
         configuration.userContentController.addUserScript(
             WKUserScript(
                 source: saveBridge.bootstrapScript,
@@ -24,6 +27,11 @@ final class GameViewController: UIViewController, WKNavigationDelegate {
         webView.scrollView.bounces = false
         webView.isOpaque = false
         webView.backgroundColor = .black
+#if DEBUG
+        if #available(iOS 16.4, *) {
+            webView.isInspectable = true
+        }
+#endif
         view = webView
     }
 
@@ -36,19 +44,11 @@ final class GameViewController: UIViewController, WKNavigationDelegate {
     override var prefersHomeIndicatorAutoHidden: Bool { true }
 
     private func loadGame() {
-        guard
-            let resources = Bundle.main.resourceURL,
-            let index = Bundle.main.url(
-                forResource: "index",
-                withExtension: "html",
-                subdirectory: "client"
-            )
-        else {
+        guard let gameURL = URL(string: "browserquest://app/client/index.html") else {
             showLoadError()
             return
         }
-
-        webView.loadFileURL(index, allowingReadAccessTo: resources)
+        webView.load(URLRequest(url: gameURL))
     }
 
     private func showLoadError() {
@@ -63,5 +63,15 @@ final class GameViewController: UIViewController, WKNavigationDelegate {
 
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         loadGame()
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        print("[BrowserQuest navigation] \(error.localizedDescription)")
+        showLoadError()
+    }
+
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        print("[BrowserQuest navigation] \(error.localizedDescription)")
+        showLoadError()
     }
 }
